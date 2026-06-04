@@ -1,12 +1,12 @@
-# Reference YAMLs
+# YAMLs oficiais de referência
 
-This directory stores selected official MPAS-JEDI reference YAMLs used for comparison.
+Este diretório armazena cópias selecionadas dos YAMLs oficiais do MPAS-JEDI usados como referência nas análises.
 
-Files:
+Arquivos:
 
 - [3dvar.yaml](3dvar.yaml)
 - [3dfgat.yaml](3dfgat.yaml)
 - [hofx3d.yaml](hofx3d.yaml)
 - [obsop_name_map.yaml](obsop_name_map.yaml)
 
-These are reference copies for documentation and analysis. Operational edits should not be made here.
+Estes arquivos são cópias de referência para documentação e comparação. Não devem ser editados como configuração operacional.

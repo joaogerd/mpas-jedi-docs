@@ -1,56 +1,58 @@
-# MPAS-JEDI documentation and diagnostics
+# Documentação e diagnósticos do MPAS-JEDI
 
-This repository organizes documentation generated while investigating MPAS-JEDI and MONAN-JEDI experiments on the JACI HPC system.
+Este repositório organiza a documentação produzida durante a investigação de experimentos MPAS-JEDI e MONAN-JEDI na máquina JACI.
 
-The immediate goal is to document a reliable path for running and adapting MPAS-JEDI variational experiments, starting from a configuration that is already known to pass.
+O objetivo imediato é documentar um caminho confiável para executar e adaptar experimentos variacionais do MPAS-JEDI, partindo de uma configuração que já foi comprovadamente executada com sucesso.
 
-## Current focus
+## Foco atual
 
-We are investigating the MPAS-JEDI 3DVar and 3D-FGAT workflow used as a basis for MONAN-JEDI experiments.
+Estamos investigando a configuração e a execução de casos 3DVar e 3D-FGAT do MPAS-JEDI, com o objetivo de apoiar a construção futura de workflows MONAN-JEDI.
 
-The current working strategy is:
+A estratégia atual é:
 
-1. Identify an official MPAS-JEDI test that passes.
-2. Document exactly which YAML, executable, runtime directory and input files are used.
-3. Document the role of every required file.
-4. Map official files to available tutorial/MONAN files.
-5. Reconfigure the passing YAML progressively, changing one component at a time.
-6. Only after the manual/isolated case is understood and reproduced should the operational workflow be updated.
+1. Identificar uma rodada oficial do MPAS-JEDI que passa.
+2. Documentar exatamente qual YAML, executável, diretório de execução e arquivos de entrada foram usados.
+3. Documentar a função de cada arquivo necessário.
+4. Mapear os arquivos oficiais para os arquivos disponíveis no tutorial/MONAN.
+5. Reconfigurar progressivamente o YAML que passou, alterando apenas um componente por vez.
+6. Somente depois que o caso manual/isolado estiver compreendido e reproduzido, atualizar o workflow operacional.
 
-## Main sections
+## Seções principais
 
-### Baseline
+### Baseline oficial
 
-Start here:
+Comece por aqui:
 
-- [Official 3DVar baseline documentation](docs/baseline/README.md)
+- [Baseline oficial 3DVar](docs/baseline/README.md)
 
-Important documents:
+Documentos principais:
 
-- [Official run inventory](docs/baseline/passing_3dvar_official_run_inventory.md)
-- [Required files inventory](docs/baseline/passing_3dvar_required_files.md)
-- [Official-to-tutorial file mapping](docs/baseline/official_3dvar_to_tutorial_file_mapping.md)
-- [Reconfiguration plan](docs/baseline/reconfigure_passing_3dvar_to_tutorial_plan.md)
+- [Inventário da rodada oficial](docs/baseline/passing_3dvar_official_run_inventory.md)
+- [Inventário dos arquivos necessários](docs/baseline/passing_3dvar_required_files.md)
+- [Mapeamento entre arquivos oficiais e arquivos do tutorial](docs/baseline/official_3dvar_to_tutorial_file_mapping.md)
+- [Plano de reconfiguração progressiva](docs/baseline/reconfigure_passing_3dvar_to_tutorial_plan.md)
 
-### Diagnostics
+### Diagnósticos
 
-Historical diagnostic reports from the FGAT investigation:
+Relatórios históricos da investigação do 3DVar/3D-FGAT:
 
-- [Diagnostic reports index](docs/diagnostics/README.md)
+- [Índice dos relatórios de diagnóstico](docs/diagnostics/README.md)
 
-### Reference YAMLs
+### YAMLs de referência
 
-Selected official MPAS-JEDI YAMLs used for comparison:
+Cópias selecionadas dos YAMLs oficiais do MPAS-JEDI usados para comparação:
 
-- [Reference YAMLs](docs/reference-yamls/README.md)
+- [YAMLs oficiais de referência](docs/reference-yamls/README.md)
 
-## Key conclusions so far
+## Conclusões principais até aqui
 
-The official MPAS-JEDI 3DVar test passes using the 480 km `x1.2562` mesh. It also works with MPI ranks for which a matching graph partition exists, for example `x1.2562.graph.info.part.16`.
+A rodada oficial 3DVar do MPAS-JEDI passa usando a malha de 480 km `x1.2562`.
 
-The 64-rank official test fails if `x1.2562.graph.info.part.64` is missing. This is a decomposition-file issue, not a generic MPI or CTest failure.
+Ela também funciona com números de ranks para os quais existe um arquivo de particionamento compatível, por exemplo `x1.2562.graph.info.part.16`.
 
-Tutorial data found so far mostly use different meshes, such as `x1.10242` and `x1.40962`. Therefore, these files must be handled as a consistent package:
+A execução oficial com 64 ranks falha quando o arquivo `x1.2562.graph.info.part.64` não existe. Isso caracteriza um problema de decomposição da malha, e não uma falha genérica de MPI, CTest ou do executável.
+
+Os dados do tutorial encontrados até agora usam majoritariamente outras malhas, como `x1.10242`, `x1.40962` e `x1.62691`. Portanto, os seguintes arquivos precisam ser tratados como um pacote coerente:
 
 - background;
 - invariant/static mesh;
@@ -58,12 +60,14 @@ Tutorial data found so far mostly use different meshes, such as `x1.10242` and `
 - namelist;
 - streams.
 
-They should not be replaced independently.
+Eles não devem ser substituídos individualmente sem verificar compatibilidade de malha, data, resolução e decomposição.
 
-Earlier FGAT diagnostics showed that the isolated FGAT path works without observers when using MPASstatic, but fails when the Aircraft observer is activated, even with official IODA. This means the problem is not explained only by the workflow-generated Aircraft HDF5. The next reliable path is to start from the official 3DVar baseline that passes and adapt it progressively.
+Os diagnósticos anteriores indicaram que o caminho FGAT isolado funciona sem observers quando usa `MPASstatic`, mas falha quando o observer `Aircraft` é ativado, mesmo com IODA oficial. Assim, a falha não é explicada apenas pelo arquivo HDF5 de Aircraft gerado pelo workflow.
 
-## Repository policy
+A abordagem atual é retornar para a baseline oficial 3DVar que passa e adaptá-la passo a passo.
 
-This repository is for documentation and analysis only.
+## Política do repositório
 
-Do not store large NetCDF/HDF5 data files here. Use paths, inventories and reproducible instructions instead.
+Este repositório é destinado apenas à documentação, análise e rastreabilidade técnica.
+
+Não armazene aqui arquivos grandes, como NetCDF ou HDF5. Use caminhos, inventários, relatórios e instruções reprodutíveis.

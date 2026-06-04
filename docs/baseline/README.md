@@ -1,16 +1,18 @@
-# Official 3DVar baseline
+# Baseline oficial 3DVar
 
-This section documents the MPAS-JEDI official 3DVar test that is known to pass on JACI.
+Esta seção documenta a rodada oficial do MPAS-JEDI 3DVar que já foi comprovadamente executada com sucesso na JACI.
 
-The goal is to start from a proven baseline before adapting any MONAN/tutorial data.
+O objetivo é partir de uma configuração confiável antes de adaptar arquivos do tutorial ou do MONAN-JEDI.
 
-## Documents
+## Documentos
 
-- [Official run inventory](passing_3dvar_official_run_inventory.md)
-- [Required files inventory](passing_3dvar_required_files.md)
-- [Official-to-tutorial file mapping](official_3dvar_to_tutorial_file_mapping.md)
-- [Reconfiguration plan](reconfigure_passing_3dvar_to_tutorial_plan.md)
+- [Inventário da rodada oficial](passing_3dvar_official_run_inventory.md)
+- [Inventário dos arquivos necessários](passing_3dvar_required_files.md)
+- [Mapeamento entre arquivos oficiais e arquivos do tutorial](official_3dvar_to_tutorial_file_mapping.md)
+- [Plano de reconfiguração progressiva](reconfigure_passing_3dvar_to_tutorial_plan.md)
 
-## Key conclusion
+## Conclusão principal
 
-The passing baseline uses the official 480 km `x1.2562` mesh. Tutorial data found so far mostly use other meshes, such as `x1.10242` and `x1.40962`. Therefore, background, invariant, graph, namelist and streams must be treated as a consistent package, not replaced one by one.
+A baseline que passou usa a malha oficial de 480 km, identificada como `x1.2562`.
+
+Os dados do tutorial encontrados até agora usam majoritariamente outras malhas, como `x1.10242`, `x1.40962` e `x1.62691`. Portanto, arquivos como `background`, `invariant`, `graph`, `namelist` e `streams` devem ser tratados como um pacote coerente, e não substituídos individualmente.
