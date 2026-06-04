@@ -1,0 +1,340 @@
+test:
+  float relative tolerance: 0.00000001
+  integer tolerance: 1
+  reference filename: testoutput/hofx3d.ref
+  log output filename: testoutput/hofx3d.run
+  test output filename: testoutput/hofx3d.run.ref
+time window:
+  begin: '2018-04-14T21:00:00Z'
+  length: PT6H
+geometry:
+  nml_file: "./Data/480km/namelist.atmosphere_2018041500"
+  streams_file: "./Data/480km/streams.atmosphere"
+state:
+  state variables:
+  - air_temperature
+  - water_vapor_mixing_ratio_wrt_moist_air
+  - eastward_wind
+  - northward_wind
+  - air_pressure_at_surface
+  - cloud_liquid_water
+  - cloud_liquid_ice
+  - rain_water
+  - snow_water
+  - graupel
+  - air_potential_temperature
+  - dry_air_density
+  - u
+  - water_vapor_mixing_ratio_wrt_dry_air
+  - air_pressure
+  - landmask
+  - seaice_fraction
+  - snowc
+  - skin_temperature_at_surface
+  - ivgtyp
+  - isltyp
+  - snowh
+  - vegetation_area_fraction
+  - eastward_wind_at_10m
+  - northward_wind_at_10m
+  - lai
+  - smois
+  - tslb
+  - cldfrac
+  filename: "./Data/480km/bg/mpasout.2018-04-15_00.00.00.nc"
+  date: '2018-04-15T00:00:00Z'
+observations:
+  observers:
+  - obs space:
+      name: Radiosonde
+      obsdatain:
+        engine:
+          type: H5File
+          obsfile: Data/ufo/testinput_tier_1/sondes_obs_2018041500_m.nc4
+      obsdataout:
+        engine:
+          type: H5File
+          obsfile: Data/os/obsout_hofx3d_sondes.nc4
+      simulated variables: [airTemperature, windEastward, windNorthward, specificHumidity]
+    obs operator:
+      name: VertInterp
+      observation alias file: testinput/obsop_name_map.yaml
+  - obs space:
+      name: Aircraft
+      obsdatain:
+        engine:
+          type: H5File
+          obsfile: Data/ufo/testinput_tier_1/aircraft_obs_2018041500_m.nc4
+      obsdataout:
+        engine:
+          type: H5File
+          obsfile: Data/os/obsout_hofx3d_aircraft.nc4
+      simulated variables: [airTemperature, windEastward, windNorthward, specificHumidity]
+    obs operator:
+      name: VertInterp
+      observation alias file: testinput/obsop_name_map.yaml
+  - obs space:
+      name: GnssroRefNCEP
+      obsdatain:
+        engine:
+          type: H5File
+          obsfile: Data/ufo/testinput_tier_1/gnssro_obs_2018041500_s.nc4
+      obsdataout:
+        engine:
+          type: H5File
+          obsfile: Data/os/obsout_hofx3d_gnssroref.nc4
+      simulated variables: [atmosphericRefractivity]
+    obs operator:
+      name: GnssroRefNCEP
+      obs options:
+        use_compress: 0
+  - obs space:
+      name: GnssroBndNBAM
+      obsdatain:
+        engine:
+          type: H5File
+          obsfile: Data/ufo/testinput_tier_1/gnssro_obs_2018041500_3prof.nc4
+        obsgrouping:
+          group variables: [ sequenceNumber ]
+          sort variable: impactHeightRO
+          sort order: ascending
+      obsdataout:
+        engine:
+          type: H5File
+          obsfile: Data/os/obsout_hofx3d_gnssrobndnbam.nc4
+      simulated variables: [bendingAngle]
+    obs operator:
+      name: GnssroBndNBAM
+      obs options:
+        use_compress: 1
+        sr_steps: 2
+        vertlayer: full
+        super_ref_qc: NBAM
+        modeltop: 30 # model top height in km
+        #nlevadd: 13 # extended model layers on top of the existing model levels
+        #ngrd: 80 # number of integration grids for bending angle
+  - obs space:
+      name: GnssroBendMetOffice
+      obsdatain:
+        engine:
+          type: H5File
+          obsfile: Data/ufo/testinput_tier_1/gnssro_obs_2018041500_3prof.nc4
+        obsgrouping:
+          group variables: [ sequenceNumber ]
+      obsdataout:
+        engine:
+          type: H5File
+          obsfile: Data/os/obsout_hofx3d_gnssrobndmetoffice.nc4
+      simulated variables: [bendingAngle]
+    obs operator:
+      name: GnssroBendMetOffice
+      vert_interp_ops: true
+      pseudo_ops: true
+      min_temp_grad: 1.0e-6
+# need to use different obs file for GnssroRefMetOffice
+# that has height instead of height MetaData
+#  - obs space:
+#      name: GnssroRefMetOffice
+#      obsdatain:
+#        obsfile: Data/ufo/testinput_tier_1/gnssro_obs_2018041500_3prof.nc4
+#      obsdataout:
+#        obsfile: Data/os/obsout_hofx3d_gnssrorefmetoffice.nc4
+#      simulated variables: [atmosphericRefractivity]
+#    obs operator:
+#      name: GnssroRefMetOffice
+  - obs space:
+      name: AMSUA-NOAA19--nohydro
+      obsdatain:
+        engine:
+          type: H5File
+          obsfile: Data/ufo/testinput_tier_1/amsua_n19_obs_2018041500_m.nc4
+      obsdataout:
+        engine:
+          type: H5File
+          obsfile: Data/os/obsout_hofx3d_amsua_n19--nohydro.nc4
+      simulated variables: [brightnessTemperature]
+      channels: 9-14
+    obs operator: &crtmobsoper
+      name: CRTM
+      Absorbers: [H2O,O3]
+      SurfaceWindGeoVars: uv
+      obs options: &crtmobsopts
+        Sensor_ID: amsua_n19
+        EndianType: little_endian
+        CoefficientPath: Data/UFOCoeff/
+  - obs space:
+      name: AMSUA-NOAA19--hydro
+      obsdatain:
+        engine:
+          type: H5File
+          obsfile: Data/ufo/testinput_tier_1/amsua_n19_obs_2018041500_m.nc4
+      obsdataout:
+        engine:
+          type: H5File
+          obsfile: Data/os/obsout_hofx3d_amsua_n19--hydro.nc4
+      simulated variables: [brightnessTemperature]
+      channels: 1-3,15
+    obs operator:
+      <<: *crtmobsoper
+      Clouds: [Water, Ice, Rain, Snow, Graupel]
+      obs options:
+        <<: *crtmobsopts
+  - obs space:
+      name: AIRS-AQUA
+      obsdatain:
+        engine:
+          type: H5File
+          obsfile: Data/ufo/testinput_tier_1/airs_aqua_obs_2018041500_m.nc4
+      obsdataout:
+        engine:
+          type: H5File
+          obsfile: Data/os/obsout_hofx3d_airs_aqua.nc4
+      simulated variables: [brightnessTemperature]
+      channels: 1,6-7
+    obs operator:
+      <<: *crtmobsoper
+      obs options:
+        <<: *crtmobsopts
+        Sensor_ID: airs_aqua
+        IRVISlandCoeff: IGBP
+  - obs space:
+      name: CRIS-NPP
+      obsdatain:
+        engine:
+          type: H5File
+          obsfile: Data/ufo/testinput_tier_1/cris-fsr_npp_obs_2018041500_m.nc4
+      obsdataout:
+        engine:
+          type: H5File
+          obsfile: Data/os/obsout_hofx3d_cris-fsr_npp.nc4
+      simulated variables: [brightnessTemperature]
+      channels: 28,32,143,145,224,275,995,1008
+    obs operator:
+      <<: *crtmobsoper
+      obs options:
+        <<: *crtmobsopts
+        Sensor_ID: cris-fsr_npp
+        IRVISlandCoeff: IGBP
+  - obs space:
+      name: IASI-METOPA
+      obsdatain:
+        engine:
+          type: H5File
+          obsfile: Data/ufo/testinput_tier_1/iasi_metop-a_obs_2018041500_m.nc4
+      obsdataout:
+        engine:
+          type: H5File
+          obsfile: Data/os/obsout_hofx3d_iasi_metop-a.nc4
+      simulated variables: [brightnessTemperature]
+      channels: &iasi_metop-a_channels 16,29,32,35,38,41,44
+    obs operator:
+      <<: *crtmobsoper
+      obs options:
+        <<: *crtmobsopts
+        Sensor_ID: iasi_metop-a
+        IRVISlandCoeff: IGBP
+#    get values:
+#      tropopause pressure method: wmo
+    obs filters:
+#  Cloud Detection Check
+    - filter: Bounds Check
+      filter variables:
+      - name: brightnessTemperature
+        channels: *iasi_metop-a_channels
+      test variables:
+      - name: ObsFunction/CloudDetectMinResidualIR
+        channels: *iasi_metop-a_channels
+        options:
+          channels: *iasi_metop-a_channels
+          use_flag: &use_flag_list [1,-1,-1,-1,1,-1,-1]
+          use_flag_clddet: *use_flag_list
+          obserr_dtempf: [0.50,2.00,4.00,2.00,4.00]
+      maxvalue: 1.0e-12
+      action:
+        name: reject
+#  Useflag Check
+    - filter: Bounds Check
+      filter variables:
+      - name: brightnessTemperature
+        channels: *iasi_metop-a_channels
+      test variables:
+      - name: ObsFunction/ChannelUseflagCheckRad
+        channels: *iasi_metop-a_channels
+        options:
+          channels: *iasi_metop-a_channels
+          use_flag: *use_flag_list
+      minvalue: 1.0e-12
+      action:
+        name: reject
+#    - obs space:
+#        name: ATMS-NPP--ch5-15
+#        obsdatain:
+#          engine:
+#            type: H5File
+#            obsfile: Data/atms_npp_obs_2018041500_m.nc4
+#        obsdataout:
+#          engine:
+#            type: H5File
+#            obsfile: Data/os/obsout_hofx3d_atms_npp--ch5-15.nc4
+#        simulated variables: [brightnessTemperature]
+#        channels: 5-15
+#      obs operator:
+#        <<: *crtmobsoper
+#        obs options:
+#          <<: *crtmobsopts
+#          Sensor_ID: atms_npp
+#    - obs space:
+#        name: ATMS-NPP--ch1-4,16-22
+#        obsdatain:
+#          engine:
+#            type: H5File
+#            obsfile: Data/atms_npp_obs_2018041500_m.nc4
+#        obsdataout:
+#          engine:
+#            type: H5File
+#            obsfile: Data/os/obsout_hofx3d_atms_npp--ch1-4,16-22.nc4
+#        simulated variables: [brightnessTemperature]
+#        channels: 1-4,16-22
+#      obs operator:
+#        <<: *crtmobsoper
+#        Clouds: [Water, Ice, Rain, Snow, Graupel]
+#        obs options:
+#          <<: *crtmobsopts
+#          Sensor_ID: atms_npp
+  - obs space:
+      name: SfcCorrected
+      obsdatain:
+        engine:
+          type: H5File
+          obsfile: Data/ufo/testinput_tier_1/sfc_obs_2018041500_m.nc4
+      obsdataout:
+        engine:
+          type: H5File
+          obsfile: Data/os/obsout_hofx3d_sfc.nc4
+      simulated variables: [stationPressure]
+    obs operator:
+      name: SfcCorrected
+      correction scheme to use: UKMO   # or WRFDA
+
+  - obs space:
+      name: Surface U,V
+      obsdatain:
+        engine:
+          type: H5File
+          obsfile: Data/ufo/testinput_tier_1/sfc_obs_2018041500_m.nc4
+      obsdataout:
+        engine:
+          type: H5File
+          obsfile: Data/os/obsout_hofx3d_sfc_uv.nc4
+      simulated variables: [windEastward, windNorthward]
+    obs operator:
+      name: VertInterp
+      vertical coordinate: height_above_mean_sea_level
+      observation vertical coordinate: height
+      interpolation method: linear
+
+      hofx scaling field: wind_reduction_factor_at_10m
+      hofx scaling field group: GeoVaLs
+      variables:
+      - name: windEastward
+      - name: windNorthward
